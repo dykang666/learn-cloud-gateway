@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: learn-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: baidu
+          uri: https://www.baidu.com
+          predicates:
+            - Path=/baidu/**
+          filters:
+            - StripPrefix=1
+        - id: service1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/service1/**
+        # Method
+        - id: service2
+          uri: http://localhost:8081
+          predicates:
+            - Path=/service2/**
+            - Method=GET
+          # Query1
+        - id: service3
+          uri: http://localhost:8081
+          predicates:
+            - Path=/service3/**
+            - Query=name
+        # Query2
+        - id: service4
+          uri: http://localhost:8081
+          predicates:
+            - Path=/service4/**
+            - Query=name,kk.   #匹配请求参数中包含name的请求
+        # 限制IP
+        - id: service5
+          uri: http://localhost:8081
+          predicates:
+            - Path=/service5/**
+            - RemoteAddr=192.168.0.111/0
+        # Header
+        - id: service6
+          uri: http://localhost:8081
+          predicates:
+            - Path=/service6/**
+            - Header=target-service, ^.+$ # 请求Header中必须包含target-service字段，且其值不能为空
+        # Host路由断言工厂
+        - id: service7
+          uri: http://localhost:8081
+          predicates:
+            - Host=**.localhost:8080,https://www.baidu.com
+        # 权重路由
+        - id: weight_high
+          uri: https://www.gwm.com.cn/
+          predicates:
+              - Weight=group1, 8
+              - Path=/service8/hello
+#          filters:
+#              - StripPrefix=1
+        # 权重路由
+        - id: weight_low
+          uri: https://www.mi.com/index.html
+          predicates:
+            - Weight=group1, 2
+            - Path=/service8/hello
+#          filters:
+#            - StripPrefix=1
